@@ -28,7 +28,6 @@ let audioCtx = null;
 let glitchActive = false;
 let glitchTimer = 0;
 let recordingMode = false;
-let lastFrameTime = performance.now();
 
 // Screen shake variables
 let shakeActive = false;
@@ -189,7 +188,8 @@ function init() {
     buildArchiveNodes();
     setupSystemLights();
     buildMobileKeypad();
-    createGlitchOverlay(); // Visual glitch effect overlay
+    setupMobilePanels(); // Added to tie the sliding drawers together
+    createGlitchOverlay();
 
     const exploreBtn = document.getElementById('explore-btn');
     if (exploreBtn) exploreBtn.addEventListener('click', startExplorationEngine);
@@ -363,7 +363,7 @@ function setupSystemLights() {
 }
 
 // ==========================================================================
-// 5. MOBILE OVERLAY CONSOLE ON-SCREEN KEYPAD
+// 5. MOBILE CONSOLE INTERFACE & SLIDING SIDEBAR REGISTERS
 // ==========================================================================
 function buildMobileKeypad() {
     if (document.getElementById('mobile-gamepad')) return;
@@ -428,6 +428,38 @@ function buildMobileKeypad() {
     });
 
     document.body.appendChild(gamepadContainer);
+}
+
+function setupMobilePanels() {
+    const leftTrigger = document.getElementById('toggle-left-panel');
+    const rightTrigger = document.getElementById('toggle-right-panel');
+    const diagnosticsPanel = document.getElementById('diagnostics-panel');
+    const inspectorPanel = document.getElementById('inspector-panel');
+
+    if (leftTrigger && diagnosticsPanel) {
+        leftTrigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            diagnosticsPanel.classList.toggle('mobile-active');
+            if (inspectorPanel) inspectorPanel.classList.remove('mobile-active');
+        });
+    }
+
+    if (rightTrigger && inspectorPanel) {
+        rightTrigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            inspectorPanel.classList.toggle('mobile-active');
+            if (diagnosticsPanel) diagnosticsPanel.classList.remove('mobile-active');
+        });
+    }
+
+    // Auto close open sliding drawers when touching the active 3D canvas
+    const canvasContainer = document.getElementById('canvas-container');
+    if (canvasContainer) {
+        canvasContainer.addEventListener('click', () => {
+            if (diagnosticsPanel) diagnosticsPanel.classList.remove('mobile-active');
+            if (inspectorPanel) inspectorPanel.classList.remove('mobile-active');
+        });
+    }
 }
 
 // ==========================================================================
@@ -606,7 +638,7 @@ function updateGlitchEffect() {
 }
 
 // ==========================================================================
-// 9. SCREEN SHAKE / JAR EFFECT (The missing feature from the old file)
+// 9. SCREEN SHAKE / JAR EFFECT
 // ==========================================================================
 function triggerCameraShake(intensity = MAX_SHAKE_INTENSITY, duration = 12) {
     shakeActive = true;
@@ -616,7 +648,6 @@ function triggerCameraShake(intensity = MAX_SHAKE_INTENSITY, duration = 12) {
 
 function updateCameraShake() {
     if (shakeActive && shakeDuration > 0) {
-        // Apply a random offset to the camera's position
         const offsetX = (Math.random() - 0.5) * shakeIntensity;
         const offsetY = (Math.random() - 0.5) * shakeIntensity;
         const offsetZ = (Math.random() - 0.5) * shakeIntensity;
@@ -625,7 +656,7 @@ function updateCameraShake() {
         camera.position.z += offsetZ;
 
         shakeDuration--;
-        shakeIntensity *= SHAKE_DECAY; // reduce intensity over time
+        shakeIntensity *= SHAKE_DECAY;
 
         if (shakeDuration <= 0) {
             shakeActive = false;
@@ -689,7 +720,7 @@ function updateFlightPhysics() {
         camera.position.set(0, 15, 80);
         cameraVelocity.set(0, 0, 0);
         triggerScreenGlitch();
-        triggerCameraShake(); // shake when resetting to origin
+        triggerCameraShake();
     }
 }
 
@@ -697,7 +728,7 @@ function toggleRecordingMode() {
     recordingMode = !recordingMode;
     const pad = document.getElementById('mobile-gamepad');
     if (pad) pad.style.display = recordingMode ? 'none' : 'grid';
-    document.querySelectorAll('.hud-sidebar, .hud-header, .hud-footer').forEach(p => p.style.visibility = recordingMode ? 'hidden' : 'visible');
+    document.querySelectorAll('.hud-sidebar, .hud-header, .hud-footer, #mobile-hud-triggers').forEach(p => p.style.visibility = recordingMode ? 'hidden' : 'visible');
 }
 
 function findParentNodeRoot(obj) {
@@ -712,7 +743,7 @@ function onNodeClick() {
 
     playSoundFX('click');
     triggerScreenGlitch();
-    triggerCameraShake(); // ADD THE SCREEN SHAKE HERE
+    triggerCameraShake();
 
     discoveredNodes.add(data.id);
     const counterDisplay = document.getElementById('harvest-count');
@@ -738,6 +769,12 @@ function onNodeClick() {
             newExtractBtn.addEventListener('click', () => {
                 fetchWaybackSnapshot(data.url, data.year);
             });
+        }
+
+        // On smaller screens, auto slide out the Inspector panel so the user sees the data
+        if (window.innerWidth <= 768) {
+            const inspectorPanel = document.getElementById('inspector-panel');
+            if (inspectorPanel) inspectorPanel.classList.add('mobile-active');
         }
     }
 
@@ -770,8 +807,8 @@ function animate() {
     const time = currentTime * 0.001;
 
     updateFlightPhysics();
-    updateGlitchEffect(); // Handle glitch overlay timing
-    updateCameraShake(); // Handle screen shake
+    updateGlitchEffect();
+    updateCameraShake();
 
     if (particleSystem && particleGeometry) {
         const positions = particleGeometry.attributes.position.array;

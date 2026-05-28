@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Nethernet // Internet Archaeology Void</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,8 +21,13 @@
             <div class="target-reticle"></div>
             <h2 class="intro-headline">READY TO EXPLORE THE NETHERNET?</h2>
             <button class="btn-explore" id="explore-btn">CLICK A NODE TO BEGIN ARCHAEOLOGICAL DIVE.</button>
-            <div class="navigation-tips">[ NAVIGATION TIPS: W/A/S/D OR ARROWS TO FLY | MOUSE TO LOOK ]</div>
+            <div class="navigation-tips">[ NAVIGATION TIPS: W/A/S/D OR MOBILE ON-SCREEN KEYPAD TO FLY ]</div>
         </div>
+    </div>
+
+    <div id="mobile-hud-triggers">
+        <button class="hud-toggle-btn" id="toggle-left-panel" title="Toggle Diagnostics">📊</button>
+        <button class="hud-toggle-btn" id="toggle-right-panel" title="Toggle Inspector">👁️</button>
     </div>
 
     <main class="hud-layer">
@@ -37,11 +42,23 @@
             </div>
         </header>
 
-        <section class="hud-sidebar left-panel">
-            <div class="panel-header">DEEP_SCAN_DIAGNOSTICS</div>
+        <section class="hud-sidebar left-panel" id="diagnostics-panel">
+            <div class="panel-header">
+                <span>DEEP_SCAN_DIAGNOSTICS</span>
+                <button class="panel-close-x structural-mobile-only" onclick="document.getElementById('diagnostics-panel').classList.remove('mobile-active')">[X]</button>
+            </div>
             <div class="panel-content">
                 <p class="text-mute">> INITIALIZING ARCHAEOLOGICAL PROBE...</p>
                 <p class="text-success">> ARCHIVE REGISTER CAPACITY: 50 NODES</p>
+                
+                <div class="horizon-tracker-subbox">
+                    <div class="tracker-title">// HORIZON ENGINE TARGET //</div>
+                    <div class="tracker-row">PROGRESS: <span id="horizon-progress" class="text-success">8.8</span> / <span class="text-mute">35 hrs</span></div>
+                    <div class="tracker-row">TOTAL GOAL: <span class="text-success">146.0 hrs</span></div>
+                    <div class="tracker-row">REWARD LINK: <span style="color: var(--neon-magenta);">[TICKET + IPAD]</span></div>
+                    <div class="tracker-row">DEADLINE: <span class="text-mute">AUG 01</span></div>
+                </div>
+
                 <div class="data-stream" id="data-stream">
                     <div>[OK] COGNITIVE_LINK_ESTABLISHED</div>
                     <div>[OK] CELESTIAL_ORBIT_ATTRIBUTION_STABLE</div>
@@ -51,7 +68,10 @@
         </section>
 
         <section class="hud-sidebar right-panel" id="inspector-panel">
-            <div class="panel-header">ANOMALY_INSPECTOR</div>
+            <div class="panel-header">
+                <span>ANOMALY_INSPECTOR</span>
+                <button class="panel-close-x structural-mobile-only" onclick="document.getElementById('inspector-panel').classList.remove('mobile-active')">[X]</button>
+            </div>
             <div class="panel-content">
                 <div class="placeholder-text">
                     <p class="blinking-cursor">> CLICK A SYSTEM ANOMALY TO DECRYPT</p>
@@ -67,11 +87,11 @@
 
         <footer class="hud-footer">
             <div class="controls-guide">
-                <span>[WASD / ARROWS] NAVIGATE VOID</span>
-                <span>[MOUSE] LOOK AROUND</span>
-                <span>[CLICK SYSTEM NODE] ANALYZE ANOMALY</span>
+                <span class="desktop-only">[WASD / ARROWS] NAVIGATE VOID</span>
+                <span class="desktop-only">[MOUSE] LOOK AROUND</span>
+                <span>[TOUCH / CLICK NODE] ANALYZE ANOMALY</span>
                 <span>[EXTRACT DATA] ACCESS VIEWPORT PORTAL</span>
-                <span>[R] HUD DISPLAY STEALTH</span>
+                <span class="desktop-only">[R] HUD DISPLAY STEALTH</span>
             </div>
         </footer>
 

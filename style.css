@@ -8,7 +8,7 @@
     --amber-dim: #996a00;
     --neon-magenta: #ff007f;
     --neon-cyan: #00f3ff;
-    --panel-bg: rgba(20, 10, 25, 0.75);
+    --panel-bg: rgba(20, 10, 25, 0.85);
     --panel-border: rgba(255, 176, 0, 0.25);
     
     /* Typography */
@@ -49,7 +49,6 @@ body, html {
 /* ==========================================================================
    3. CRT MONITOR SIMULATION
    ========================================================================== */
-/* The curved glass shadow overlay */
 .crt-overlay {
     position: absolute;
     top: 0;
@@ -61,7 +60,6 @@ body, html {
     z-index: 999;
 }
 
-/* Animated scanning lines */
 .scanlines {
     position: absolute;
     top: 0;
@@ -83,7 +81,6 @@ body, html {
     animation: crt-flicker 0.15s infinite;
 }
 
-/* Screen refresh line animation */
 .scanlines::after {
     content: " ";
     display: block;
@@ -96,7 +93,7 @@ body, html {
 }
 
 /* ==========================================================================
-   4. HUD LAYOUT & PANELS
+   4. HUD LAYOUT & PANELS (DESKTOP GRID)
    ========================================================================== */
 .hud-layer {
     position: absolute;
@@ -117,7 +114,6 @@ body, html {
     pointer-events: none; /* Let clicks pass through to Three.js canvas */
 }
 
-/* Enable pointer events only for interactive UI elements */
 .hud-header, .hud-sidebar, .hud-footer {
     pointer-events: auto;
     background: var(--panel-bg);
@@ -158,6 +154,7 @@ body, html {
 
 .coordinates {
     color: var(--amber-dim);
+    font-size: 0.85rem;
 }
 
 #coord-x, #coord-z {
@@ -169,6 +166,7 @@ body, html {
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
 .left-panel { grid-area: left-panel; }
@@ -176,12 +174,13 @@ body, html {
 
 .panel-header {
     background: rgba(255, 176, 0, 0.1);
-    padding: 8px 15px;
+    padding: 10px 15px;
     font-family: var(--font-heading);
     font-weight: 700;
     border-bottom: 1px solid var(--panel-border);
     display: flex;
     justify-content: space-between;
+    align-items: center;
 }
 
 .panel-content {
@@ -191,6 +190,41 @@ body, html {
     flex-direction: column;
     gap: 12px;
     overflow-y: auto;
+}
+
+.panel-close-x {
+    background: transparent;
+    border: none;
+    color: var(--neon-magenta);
+    font-family: var(--font-mono);
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1.1rem;
+    padding: 5px;
+}
+
+/* --- Horizon Campaign Tracking Layout --- */
+.horizon-tracker-subbox {
+    background: rgba(255, 176, 0, 0.05);
+    border: 1px solid rgba(255, 176, 0, 0.2);
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 5px;
+}
+
+.tracker-title {
+    font-family: var(--font-heading);
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: var(--amber-glow);
+    margin-bottom: 6px;
+    letter-spacing: 0.1em;
+}
+
+.tracker-row {
+    font-size: 0.8rem;
+    margin-bottom: 4px;
+    color: rgba(255, 255, 255, 0.85);
 }
 
 /* --- Left Panel Details (Terminal Log Stream) --- */
@@ -241,13 +275,14 @@ body, html {
     background: transparent;
     border: 1px solid var(--amber-glow);
     color: var(--amber-glow);
-    padding: 10px;
+    padding: 12px;
     font-family: var(--font-mono);
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
     margin-top: auto;
     text-transform: uppercase;
+    min-height: 44px; /* Accessible Touch Area */
 }
 
 .btn-primary:hover {
@@ -270,6 +305,7 @@ body, html {
     gap: 30px;
     font-size: 0.75rem;
     color: var(--amber-dim);
+    text-align: center;
 }
 
 /* ==========================================================================
@@ -292,14 +328,12 @@ body, html {
     transform: scale(1);
 }
 
-/* Use when closed / hidden away dynamically */
 #archive-viewport-container.hidden {
     display: none !important;
     transform: scale(0.85);
     opacity: 0;
 }
 
-/* Header structural console for the viewport module */
 .viewport-header {
     background: rgba(0, 243, 255, 0.15);
     border-bottom: 2px solid var(--neon-cyan);
@@ -316,17 +350,23 @@ body, html {
     font-weight: 700;
     font-size: 0.95rem;
     letter-spacing: 0.1em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-right: 10px;
 }
 
 .viewport-close-btn {
     background: transparent;
     border: 1px solid var(--neon-cyan);
     color: var(--neon-cyan);
-    padding: 4px 12px;
+    padding: 6px 14px;
     font-family: var(--font-mono);
     font-size: 0.8rem;
     cursor: pointer;
     transition: all 0.2s ease;
+    min-height: 35px;
+    white-space: nowrap;
 }
 
 .viewport-close-btn:hover {
@@ -335,33 +375,162 @@ body, html {
     box-shadow: 0 0 10px var(--neon-cyan);
 }
 
-/* Safe interactive Sandbox frame */
 .archive-frame {
     width: 100%;
     flex-grow: 1;
     border: none;
-    background: #fff; /* Restored white backplane so ancient text styling colors render readably */
+    background: #fff;
 }
 
 /* ==========================================================================
-   6. MOBILE KEYPAD OVERLAY (SYSTEM CONTROLS)
+   6. MOBILE VIEW TRIGGERS & CONTROLS OVERLAYS
    ========================================================================== */
+#mobile-hud-triggers {
+    display: none; /* Hidden on Desktop configurations */
+    position: fixed;
+    top: 75px;
+    left: 15px;
+    z-index: 100;
+    flex-direction: column;
+    gap: 12px;
+    pointer-events: auto;
+}
+
+.hud-toggle-btn {
+    width: 46px;
+    height: 46px;
+    border-radius: 8px;
+    background: var(--panel-bg);
+    border: 1px solid var(--panel-border);
+    color: #fff;
+    font-size: 1.3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(255, 176, 0, 0.1);
+    transition: background 0.2s;
+}
+
+.hud-toggle-btn:active {
+    background: rgba(255, 176, 0, 0.25);
+}
+
 #mobile-gamepad {
-    /* Base appearance – positioned by JS */
     transition: opacity 0.3s ease, visibility 0.3s;
     opacity: 1;
     visibility: visible;
 }
 
-/* Fades out when the archive viewport is opened */
 #mobile-gamepad.hidden {
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
+
+.structural-mobile-only {
+    display: none;
 }
 
 /* ==========================================================================
-   7. REUSABLE UTILITIES & KEYFRAMES
+   7. RESPONSIVE MOBILE MEDIA QUERIES (MAX-WIDTH: 768px)
+   ========================================================================== */
+@media (max-width: 768px) {
+    /* Reconstruct desktop grid into stacked overlay layout components */
+    .hud-layer {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr;
+        grid-template-areas: 
+            "header"
+            "space";
+        padding: 10px;
+        gap: 0;
+    }
+
+    .desktop-only {
+        display: none !important;
+    }
+
+    .structural-mobile-only {
+        display: block;
+    }
+
+    .hud-header {
+        padding: 10px;
+        height: auto;
+        flex-direction: column;
+        gap: 6px;
+        align-items: flex-start;
+    }
+
+    .header-right {
+        width: 100%;
+        text-align: left;
+    }
+
+    .coordinates {
+        font-size: 0.75rem;
+    }
+
+    /* Convert sidebars into slide-out immersive drawers */
+    .hud-sidebar {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        width: 280px;
+        height: 100%;
+        z-index: 200;
+        transform: translateX(-100%);
+        opacity: 0;
+        pointer-events: auto;
+    }
+
+    .left-panel {
+        left: 0;
+        grid-area: unset;
+    }
+
+    .right-panel {
+        right: 0;
+        left: auto;
+        grid-area: unset;
+        transform: translateX(100%);
+    }
+
+    /* Target state class injected via runtime visibility logic toggles */
+    .hud-sidebar.mobile-active {
+        transform: translateX(0);
+        opacity: 1;
+        box-shadow: 0 0 30px rgba(0, 0, 0, 0.85);
+    }
+
+    #mobile-hud-triggers {
+        display: flex;
+    }
+
+    .hud-footer {
+        display: none; /* Hide standard instructions footer to maximize mobile real estate */
+    }
+
+    /* Scale Viewport Container safely to prevent mobile notch trimming */
+    #archive-viewport-container {
+        top: 2%;
+        left: 2%;
+        width: 96%;
+        height: 96%;
+    }
+
+    .viewport-header {
+        padding: 8px 10px;
+    }
+
+    .viewport-title {
+        font-size: 0.8rem;
+    }
+}
+
+/* ==========================================================================
+   8. REUSABLE UTILITIES & KEYFRAMES
    ========================================================================== */
 .text-mute { color: var(--amber-dim); }
 .text-success { color: var(--neon-cyan); text-shadow: 0 0 4px var(--neon-cyan); }
@@ -390,7 +559,7 @@ body, html {
     100% { top: 100%; }
 }
 
-/* Custom scrollbar behavior for the sidebars */
+/* Custom scrollbar behavior for sidebars */
 ::-webkit-scrollbar {
     width: 4px;
 }
