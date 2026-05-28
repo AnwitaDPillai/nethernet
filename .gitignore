@@ -1,0 +1,16 @@
+# Dependencies (if you use npm/bundlers later)
+node_modules/
+dist/
+build/
+
+# Local environment configuration or logs
+.env
+*.log
+
+# OS-specific hidden system files
+.DS_Store
+Thumbs.db
+
+# Code editor configurations
+.vscode/
+.idea/
