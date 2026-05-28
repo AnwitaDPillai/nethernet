@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nethernet // Internet Archaeology Void</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="canvas-container"></div>
+
+    <div class="crt-overlay"></div>
+    <div class="scanlines"></div>
+
+    <div id="intro-overlay">
+        <div class="intro-content">
+            <div class="target-reticle"></div>
+            <h2 class="intro-headline">READY TO EXPLORE THE NETHERNET?</h2>
+            <button class="btn-explore" id="explore-btn">CLICK A NODE TO BEGIN ARCHAEOLOGICAL DIVE.</button>
+            <div class="navigation-tips">[ NAVIGATION TIPS: W/A/S/D OR ARROWS TO FLY | MOUSE TO LOOK ]</div>
+        </div>
+    </div>
+
+    <main class="hud-layer">
+        
+        <header class="hud-header">
+            <div class="header-left">
+                <span class="system-status blinking">● LOGGED_IN</span>
+                <h1 class="logo">NETHERNET v1.0b</h1>
+            </div>
+            <div class="header-right">
+                <span class="coordinates">GRID INDEX: <span id="harvest-count" class="text-success">00/50</span> // LAT: <span id="coord-x">0.00</span> // LNG: <span id="coord-z">0.00</span></span>
+            </div>
+        </header>
+
+        <section class="hud-sidebar left-panel">
+            <div class="panel-header">DEEP_SCAN_DIAGNOSTICS</div>
+            <div class="panel-content">
+                <p class="text-mute">> INITIALIZING ARCHAEOLOGICAL PROBE...</p>
+                <p class="text-success">> ARCHIVE REGISTER CAPACITY: 50 NODES</p>
+                <div class="data-stream" id="data-stream">
+                    <div>[OK] COGNITIVE_LINK_ESTABLISHED</div>
+                    <div>[OK] CELESTIAL_ORBIT_ATTRIBUTION_STABLE</div>
+                    <div>[WARN] DATA_FRAGMENTS_DETECTED_IN_SECTORS_90_20</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="hud-sidebar right-panel" id="inspector-panel">
+            <div class="panel-header">ANOMALY_INSPECTOR</div>
+            <div class="panel-content">
+                <div class="placeholder-text">
+                    <p class="blinking-cursor">> CLICK A SYSTEM ANOMALY TO DECRYPT</p>
+                </div>
+                <div class="site-details hidden" id="site-details">
+                    <h2 id="site-title">GEOCITIES_ARCHIVE</h2>
+                    <p class="site-date">EST: <span id="site-year">1997</span></p>
+                    <p class="site-desc" id="site-desc">A forgotten fragment of the old web, preserved in amber light.</p>
+                    <button class="btn-primary" id="extract-btn">EXTRACT DATA</button>
+                </div>
+            </div>
+        </section>
+
+        <footer class="hud-footer">
+            <div class="controls-guide">
+                <span>[WASD / ARROWS] NAVIGATE VOID</span>
+                <span>[MOUSE] LOOK AROUND</span>
+                <span>[CLICK SYSTEM NODE] ANALYZE ANOMALY</span>
+                <span>[EXTRACT DATA] ACCESS VIEWPORT PORTAL</span>
+                <span>[R] HUD DISPLAY STEALTH</span>
+            </div>
+        </footer>
+
+    </main>
+
+    <div id="archive-viewport-container" class="hidden">
+        <div class="viewport-header">
+            <span class="viewport-title" id="viewport-title">[DISCOVERY SYSTEM] FORCED MATRIX ACCESS ESTABLISHED</span>
+            <button class="viewport-close-btn" id="viewport-close-btn">CLOSE TERMINAL [X]</button>
+        </div>
+        <iframe class="archive-frame" id="archive-iframe" src="about:blank" sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
+    </div>
+
+    <script type="module" src="main.js"></script>
+</body>
+</html>

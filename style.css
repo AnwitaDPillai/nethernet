@@ -1,0 +1,405 @@
+/* ==========================================================================
+   1. SYSTEM VARIABLES & RESET
+   ========================================================================== */
+:root {
+    /* Retro Cyberpunk Palette */
+    --bg-void: #0a050d;
+    --amber-glow: #ffb000;
+    --amber-dim: #996a00;
+    --neon-magenta: #ff007f;
+    --neon-cyan: #00f3ff;
+    --panel-bg: rgba(20, 10, 25, 0.75);
+    --panel-border: rgba(255, 176, 0, 0.25);
+    
+    /* Typography */
+    --font-heading: 'Orbitron', sans-serif;
+    --font-mono: 'Fira Code', monospace;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    user-select: none; /* Prevents accidental highlighting during 3D drag */
+}
+
+body, html {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: var(--bg-void);
+    font-family: var(--font-mono);
+    color: var(--amber-glow);
+    font-size: 13px;
+    letter-spacing: 0.05em;
+}
+
+/* ==========================================================================
+   2. THREE.JS CANVAS BACKGROUND
+   ========================================================================== */
+#canvas-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1; /* Sits firmly behind the HUD */
+}
+
+/* ==========================================================================
+   3. CRT MONITOR SIMULATION
+   ========================================================================== */
+/* The curved glass shadow overlay */
+.crt-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(0,0,0,0) 60%, rgba(0,0,0,0.8) 100%);
+    pointer-events: none;
+    z-index: 999;
+}
+
+/* Animated scanning lines */
+.scanlines {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        rgba(18, 10, 26, 0) 50%, 
+        rgba(0, 0, 0, 0.35) 50%
+    ), linear-gradient(
+        90deg,
+        rgba(255, 0, 0, 0.03),
+        rgba(0, 255, 0, 0.01),
+        rgba(0, 255, 0, 0.03)
+    );
+    background-size: 100% 4px, 6px 100%;
+    pointer-events: none;
+    z-index: 998;
+    animation: crt-flicker 0.15s infinite;
+}
+
+/* Screen refresh line animation */
+.scanlines::after {
+    content: " ";
+    display: block;
+    position: absolute;
+    top: 0; left: 0; bottom: 0; right: 0;
+    background: linear-gradient(rgba(18, 16, 16, 0) 0%, rgba(255, 176, 0, 0.04) 10%, rgba(18, 16, 16, 0) 11%);
+    width: 100%;
+    height: 100%;
+    animation: vhs-scan 8s linear infinite;
+}
+
+/* ==========================================================================
+   4. HUD LAYOUT & PANELS
+   ========================================================================== */
+.hud-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+    display: grid;
+    grid-template-columns: 320px 1fr 340px;
+    grid-template-rows: 60px 1fr 40px;
+    grid-template-areas: 
+        "header header header"
+        "left-panel space right-panel"
+        "footer footer footer";
+    padding: 15px;
+    gap: 15px;
+    pointer-events: none; /* Let clicks pass through to Three.js canvas */
+}
+
+/* Enable pointer events only for interactive UI elements */
+.hud-header, .hud-sidebar, .hud-footer {
+    pointer-events: auto;
+    background: var(--panel-bg);
+    border: 1px solid var(--panel-border);
+    backdrop-filter: blur(4px);
+    box-shadow: 0 0 15px rgba(255, 176, 0, 0.05), inset 0 0 10px rgba(255, 176, 0, 0.05);
+}
+
+/* --- Header Section --- */
+.hud-header {
+    grid-area: header;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    border-bottom: 2px solid var(--amber-glow);
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.logo {
+    font-family: var(--font-heading);
+    font-weight: 900;
+    font-size: 1.4rem;
+    color: #fff;
+    text-shadow: 0 0 10px var(--amber-glow), 0 0 20px var(--amber-dim);
+}
+
+.system-status {
+    font-size: 0.75rem;
+    color: var(--neon-cyan);
+    text-shadow: 0 0 5px var(--neon-cyan);
+}
+
+.coordinates {
+    color: var(--amber-dim);
+}
+
+#coord-x, #coord-z {
+    color: var(--amber-glow);
+}
+
+/* --- Sidebar Standard Styling --- */
+.hud-sidebar {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.left-panel { grid-area: left-panel; }
+.right-panel { grid-area: right-panel; }
+
+.panel-header {
+    background: rgba(255, 176, 0, 0.1);
+    padding: 8px 15px;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    border-bottom: 1px solid var(--panel-border);
+    display: flex;
+    justify-content: space-between;
+}
+
+.panel-content {
+    padding: 15px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow-y: auto;
+}
+
+/* --- Left Panel Details (Terminal Log Stream) --- */
+.data-stream {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 0.8rem;
+    color: var(--amber-dim);
+    border-top: 1px dashed var(--panel-border);
+    padding-top: 10px;
+}
+
+/* --- Right Panel Details (Inspector Module) --- */
+.placeholder-text {
+    text-align: center;
+    margin: auto 0;
+    color: var(--amber-dim);
+}
+
+.site-details {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    height: 100%;
+}
+
+#site-title {
+    font-family: var(--font-heading);
+    color: #fff;
+    text-shadow: 0 0 8px var(--neon-magenta);
+    font-size: 1.3rem;
+}
+
+.site-date {
+    font-size: 0.8rem;
+    color: var(--neon-cyan);
+}
+
+.site-desc {
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* --- Buttons & Inputs --- */
+.btn-primary {
+    background: transparent;
+    border: 1px solid var(--amber-glow);
+    color: var(--amber-glow);
+    padding: 10px;
+    font-family: var(--font-mono);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-top: auto;
+    text-transform: uppercase;
+}
+
+.btn-primary:hover {
+    background: var(--amber-glow);
+    color: var(--bg-void);
+    box-shadow: 0 0 15px var(--amber-glow);
+}
+
+/* --- Footer Section --- */
+.hud-footer {
+    grid-area: footer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 20px;
+}
+
+.controls-guide {
+    display: flex;
+    gap: 30px;
+    font-size: 0.75rem;
+    color: var(--amber-dim);
+}
+
+/* ==========================================================================
+   5. DEEP DIVE ARCHIVE IFRAME VIEWPORT
+   ========================================================================== */
+#archive-viewport-container {
+    position: absolute;
+    top: 5%;
+    left: 5%;
+    width: 90%;
+    height: 90%;
+    z-index: 500; /* Sits over the standard HUD overlays, but underneath global scanlines */
+    background: #000;
+    border: 2px solid var(--neon-cyan);
+    box-shadow: 0 0 35px rgba(0, 243, 255, 0.35);
+    display: flex;
+    flex-direction: column;
+    opacity: 1;
+    transition: transform 0.4s cubic-bezier(0.15, 0.85, 0.35, 1), opacity 0.3s ease;
+    transform: scale(1);
+}
+
+/* Use when closed / hidden away dynamically */
+#archive-viewport-container.hidden {
+    display: none !important;
+    transform: scale(0.85);
+    opacity: 0;
+}
+
+/* Header structural console for the viewport module */
+.viewport-header {
+    background: rgba(0, 243, 255, 0.15);
+    border-bottom: 2px solid var(--neon-cyan);
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: var(--font-heading);
+    color: #fff;
+    text-shadow: 0 0 5px var(--neon-cyan);
+}
+
+.viewport-title {
+    font-weight: 700;
+    font-size: 0.95rem;
+    letter-spacing: 0.1em;
+}
+
+.viewport-close-btn {
+    background: transparent;
+    border: 1px solid var(--neon-cyan);
+    color: var(--neon-cyan);
+    padding: 4px 12px;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.viewport-close-btn:hover {
+    background: var(--neon-cyan);
+    color: #000;
+    box-shadow: 0 0 10px var(--neon-cyan);
+}
+
+/* Safe interactive Sandbox frame */
+.archive-frame {
+    width: 100%;
+    flex-grow: 1;
+    border: none;
+    background: #fff; /* Restored white backplane so ancient text styling colors render readably */
+}
+
+/* ==========================================================================
+   6. MOBILE KEYPAD OVERLAY (SYSTEM CONTROLS)
+   ========================================================================== */
+#mobile-gamepad {
+    /* Base appearance – positioned by JS */
+    transition: opacity 0.3s ease, visibility 0.3s;
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Fades out when the archive viewport is opened */
+#mobile-gamepad.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+/* ==========================================================================
+   7. REUSABLE UTILITIES & KEYFRAMES
+   ========================================================================== */
+.text-mute { color: var(--amber-dim); }
+.text-success { color: var(--neon-cyan); text-shadow: 0 0 4px var(--neon-cyan); }
+.hidden { display: none !important; }
+
+.blinking {
+    animation: blink 1.5s step-start infinite;
+}
+
+.blinking-cursor {
+    animation: blink 0.8s step-start infinite;
+}
+
+@keyframes blink {
+    50% { opacity: 0; }
+}
+
+@keyframes crt-flicker {
+    0% { opacity: 0.98; }
+    50% { opacity: 1; }
+    100% { opacity: 0.99; }
+}
+
+@keyframes vhs-scan {
+    0% { top: -100%; }
+    100% { top: 100%; }
+}
+
+/* Custom scrollbar behavior for the sidebars */
+::-webkit-scrollbar {
+    width: 4px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: var(--amber-dim);
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--amber-glow);
+}
