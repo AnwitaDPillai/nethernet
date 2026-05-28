@@ -2,7 +2,28 @@
 
 Nethernet is a high-performance 3D visualization engine that maps the history of the "dead internet", including the forums, MMOs, personal homepages, and hosting platforms that defined the early web but have since faded into the void.
 
-**Live Link:** [Deploying Soon]
+**Live Link:** [Vercel](https://nethernet.vercel.app/)
+
+---
+
+## Simulation Overview
+
+<div align="center">
+
+<!-- The Screenshot -->
+<img src="assets/Nethernet.jpg" alt="Nethernet Dashboard" width="700"/>
+
+<br>
+
+<br>
+
+<!-- Direct Link to the Video File -->
+**[▶ Watch Full-Resolution Simulation Demo](assets/Nethernet.mp4)**  
+*Opens in a new tab.*
+
+<p><em>A brief look at the agent-based dynamics in action.</em></p>
+
+</div>
 
 ---
 
