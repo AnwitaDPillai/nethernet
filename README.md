@@ -67,8 +67,15 @@ nethernet/
 └── README.md
 ```
 
+---
+
 ## Why Does This Matter?
 
 The early internet was a wildly creative, deeply human space. It was built by amateurs, maintained by enthusiasts, and largely forgotten by the corporations that now dominate the web.
 
 When a server goes offline, an entire world disappears. This project aims to make those worlds visible again... if only for a moment.
+
+---
+
+### Acknowledgements
+This project was developed using a human-in-the-loop workflow, leveraging AI tools for structural organization and technical drafting. All logic, implementation, and system design were reviewed, verified, and refined by Anwita D Pillai.
