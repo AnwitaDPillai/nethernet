@@ -15,12 +15,6 @@ Nethernet is a high-performance 3D visualization engine that maps the history of
 
 <br>
 
-<br>
-
-<!-- Direct Link to the Video File -->
-**[▶ Watch Full-Resolution Simulation Demo](assets/Nethernet.mp4)**  
-*Opens in a new tab.*
-
 <p><em>A brief look at the agent-based dynamics in action.</em></p>
 
 </div>
