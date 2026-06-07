@@ -203,15 +203,6 @@ body, html {
     padding: 5px;
 }
 
-/* --- Horizon Campaign Tracking Layout --- */
-.horizon-tracker-subbox {
-    background: rgba(255, 176, 0, 0.05);
-    border: 1px solid rgba(255, 176, 0, 0.2);
-    padding: 10px;
-    border-radius: 4px;
-    margin-bottom: 5px;
-}
-
 .tracker-title {
     font-family: var(--font-heading);
     font-size: 0.8rem;
